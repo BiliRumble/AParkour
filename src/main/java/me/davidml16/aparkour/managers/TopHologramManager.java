@@ -7,6 +7,7 @@ import me.davidml16.aparkour.Main;
 import me.davidml16.aparkour.data.LeaderboardEntry;
 import me.davidml16.aparkour.data.Parkour;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
@@ -135,24 +136,34 @@ public class TopHologramManager {
                     main.getDatabaseHandler().getParkourBestTimes(parkour.getId(), 10).thenAccept(leaderboard -> {
                         main.getLeaderboardHandler().addLeaderboard(parkour.getId(), leaderboard);
 
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-                            if(parkour.getTopHologram() != null) {
-                                if (holoBody.containsKey(parkour.getId()) && holoFooter.containsKey(parkour.getId())) {
-                                    Hologram body = holoBody.get(parkour.getId());
-                                    int i = 0;
-                                    for (; i < leaderboard.size(); i++) {
-                                        ((TextLine) body.getLine(i)).setText(main.getLanguageHandler()
-                                                .getMessage("Holograms.Top.Body.Line").replaceAll("%position%", Integer.toString(i + 1))
-                                                .replaceAll("%player%", main.getPlayerDataHandler().getPlayerName(body.getWorld(), leaderboard.get(i).getName()))
-                                                .replaceAll("%time%", main.getTimerManager().millisToString(main.getLanguageHandler().getMessage("Timer.Formats.ParkourTimer"), leaderboard.get(i).getTime())));
-                                    }
-                                    for (int j = i; j < 10; j++) {
-                                        ((TextLine) body.getLine(j)).setText(main.getLanguageHandler()
-                                                .getMessage("Holograms.Top.Body.NoTime").replaceAll("%position%", Integer.toString(j + 1)));
+                        // 异步执行
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                // Top不为空
+                                if(parkour.getTopHologram() != null) {
+                                    // 不知道
+                                    if (holoBody.containsKey(parkour.getId()) && holoFooter.containsKey(parkour.getId())) {
+                                        // 定义全息图
+                                        Hologram body = holoBody.get(parkour.getId());
+                                        // 行数=0
+                                        int i = 0;
+                                        // 循环增加
+                                        for (; i < leaderboard.size(); i++) {
+                                            // 设置行数内容
+                                            ((TextLine) body.getLine(i)).setText(main.getLanguageHandler()
+                                                    .getMessage("Holograms.Top.Body.Line").replaceAll("%position%", Integer.toString(i + 1))
+                                                    .replaceAll("%player%", main.getPlayerDataHandler().getPlayerName(body.getWorld(), leaderboard.get(i).getName()))
+                                                    .replaceAll("%time%", main.getTimerManager().millisToString(main.getLanguageHandler().getMessage("Timer.Formats.ParkourTimer"), leaderboard.get(i).getTime())));
+                                        }
+                                        for (int j = i;  j < 10; j++) {
+                                            ((TextLine) body.getLine(j)).setText(main.getLanguageHandler()
+                                                    .getMessage("Holograms.Top.Body.NoTime").replaceAll("%position%", Integer.toString(j + 1)));
+                                        }
                                     }
                                 }
                             }
-                        }, 20L);
+                        }.runTaskTimer(Main.getInstance(), 0L, 20L); 
                     });
                 }
 
@@ -162,8 +173,8 @@ public class TopHologramManager {
                 if (holoFooter.containsKey(parkour)) {
                     holoFooter.get(parkour)
                             .setText(main.getLanguageHandler()
-                                    .getMessage("Holograms.Top.Footer.Line")
-                                    .replaceAll("%time%", main.getTimerManager().millisToString(main.getLanguageHandler().getMessage("Timer.Formats.HologramUpdate"), timeLeft * 1000)));
+                            .getMessage("Holograms.Top.Footer.Line")
+                            .replaceAll("%time%", main.getTimerManager().millisToString(main.getLanguageHandler().getMessage("Timer.Formats.HologramUpdate"), timeLeft * 1000)));
                 }
             }
             timeLeft--;
