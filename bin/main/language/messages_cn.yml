@@ -8,7 +8,7 @@
 # 	
 #
 
-Prefix: '&bWh&3&lCraft &a跑酷&f>&r'
+Prefix: '&9&lAParkour &l&o&f>>&r'
 
 Commands:
   NoPerms: '%prefix% &c您没有使用此命令的权限!'
