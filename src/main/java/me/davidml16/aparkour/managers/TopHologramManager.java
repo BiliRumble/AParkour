@@ -163,11 +163,9 @@ public class TopHologramManager {
                                     }
                                 }
                             }
-                        }
-                        
+                        }.runTaskTimer(Main.getInstance(), 0L, 20L);
                     });
                 }
-
                 restartTimeLeft();
             }
             for (String parkour : main.getParkourHandler().getParkours().keySet()) {
