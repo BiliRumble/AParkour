@@ -28,6 +28,7 @@ public class LanguageHandler {
 		this.main = main;
 		new File(main.getDataFolder().toString() + "/language").mkdirs();
 		loadLanguage("en");
+		loadLanguage("cn");
 		this.language = checkLanguage(language);
 		this.messages = new HashMap<String, String>();
 	}
